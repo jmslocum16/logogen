@@ -26,6 +26,7 @@ void printUsage() {
  
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
+	printf("number of args: %d\n", argc);
 	char* arg = argv[1];
 	if (!strcmp("gradient", arg)) {
 		int i = 1;
@@ -68,18 +69,18 @@ int main(int argc, char** argv) {
 		int width, height;
 		unsigned char* maskimage = readBMP(maskname, width, height);
 		if (width != imageWidth || height != imageHeight) {
-			printf("invalid image size\n");
-			return 1;
+			printf("invalid image size of mask: %d %d\n", width, height);
+			//return 1;
 		}
 		unsigned char* blackimage = readBMP(blackname, width, height);
 		if (width != imageWidth || height != imageHeight) {
-			printf("invalid image size\n");
-			return 1;
+			printf("invalid image size of black: %d %d\n", width, height);
+			//return 1;
 		}
 		unsigned char* whiteimage = readBMP(whitename, width, height);
 		if (width != imageWidth || height != imageHeight) {
-			printf("invalid image size\n");
-			return 1;
+			printf("invalid image size of white: %d %d\n", width, height);
+			//return 1;
 		}
 		for (int i = 0; i < imageHeight; i++) {
 			for (int j = 0; j < imageWidth; j++) {
@@ -97,6 +98,28 @@ int main(int argc, char** argv) {
 		delete maskimage;
 		delete blackimage;
 		delete whiteimage;
+		delete fname;
+	} else if (!strcmp("maskgen", arg)) {
+		outname = argv[2];
+		unsigned char* newimage = new unsigned char[3 * imageWidth * imageHeight];
+		for (int i = 0; i < imageHeight; i++) {
+			for (int j = 0; j < imageWidth; j++) {
+				for (int k = 0; k < 3; k++) {
+					if ((i == 100 && j == 100) || (i == 100 && j == 200) || (i == 100 && j == 340) || (i == 100 && j == 440) ||
+						(i == 540 && j == 200) || (i == 540 && j == 300) || (i == 540 && j == 440) || (i == 540 && j == 540)) {
+						newimage[3*(i*imageWidth + j) + k] = 255;
+					} else {
+						newimage[3*(i*imageWidth + j) + k] = 0;
+					}
+				}
+			}
+		}
+		char* fname = new char[80];
+		snprintf(fname, 80, "%s.bmp", outname);
+
+		writeBMP(fname, imageWidth, imageHeight, newimage);
+
+		delete newimage;
 		delete fname;
 	} else {
 		printUsage();
